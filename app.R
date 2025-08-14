@@ -41,188 +41,6 @@ log_file_path <- "/dev/null"
 # log_file_path <- "/Users/ttm3567/Documents/January2025/GeneExpressionVisualization_v4.3.1.8_app.log"
 # log_file_path <- "/srv/shiny-server/internal_server_GEV_app.log"
 
-# if (!dir.exists(dirname(log_file_path))) {
-#   dir.create(dirname(log_file_path), recursive = TRUE)
-# }
-# log_appender(appender_file(log_file_path))
-# log_threshold(DEBUG)
-# log_layout(layout_glue_generator(format = '{time} {level} [{namespace}] {fn}(): {msg}'))
-
-# ui <- fluidPage(
-#   # Include custom styles in the head section
-#   tags$head(
-#     tags$style(HTML("
-#             .grid-container {
-#               display: grid;
-#               grid-template-columns: repeat(2, 1fr);
-#               grid-gap: 20px;
-#               padding: 20px;
-#             }
-#             .grid-item {
-#               background-color: #f8f9fa;  /* Light grey background */
-#               padding: 10px;
-#               border-radius: 5px;
-#               box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Subtle shadow for depth */
-#               overflow: hidden; /* Ensures the content fits in the grid area */
-#             }
-#         "))
-#   ),
-#   titlePanel("Winter Lab Database of Bulk RNA-seq"),
-#   tabsetPanel(
-#     id = "main_tabs",
-#     tabPanel(
-#       "Introduction",
-#       h2("Welcome to the Winter Lab Database of Bulk RNA-seq!"),
-#       br(),
-#       p(
-#         style = "font-size: 20px; margin-left: 40px; margin-right: 40px;",
-#         "This application contains published and unpublished Bulk RNA-seq datasets from mice.
-#       The primary purpose of this tool is to explore normalized gene expression levels among experimental groups from preloaded or user-loaded Bulk RNA-seq datasets."
-#       ),
-#       br(),
-#       br(),
-#       fluidRow(tags$div(
-#         style = "display: flex; justify-content: center; margin-left: 40px; margin-right: 40px;",
-#         DT::dataTableOutput("Dataset_Info")
-#       )),
-#       br(),
-#       br(),
-#       fluidRow(
-#         p(
-#           style = "font-size: 20px; margin-left: 40px; margin-right: 40px;",
-#           "For instructions on how to properly format datatables and create groupfiles, click the link below:"
-#         ),
-#         tags$a(
-#           style = "font-size: 20px; margin-left: 40px; margin-right: 40px;",
-#           id = "newapp",
-#           href = "https://winterlab-webapps.fsm.northwestern.edu/Template_GroupFileMaker_v3.1.2_App_20240521/",
-#           "Template Data and Experimental Group Formatting App."
-#         ),
-#         tags$script(
-#           HTML(
-#             "$(document).on('click', '#newapp', function (e) {
-#                       e.preventDefault();
-#                       window.open($(this).attr('href'));
-#                   });"
-#           )
-#         ),
-#         br(),
-#         br(),
-#         br(),
-#         p(
-#           style = "font-size: 20px; margin-left: 40px; margin-right: 40px;",
-#           "Below is a table with definitions of all the acronyms used in this web application."
-#         ),
-#         tags$div(
-#           style = "display: flex; justify-content: left; margin-left: 40px; margin-right: 40px;",
-#           tableOutput("legend_dataset")
-#         ),
-#         br(),
-#         br()
-#       )
-#     ),
-#     tabPanel(
-#       "Data Visualization",
-#       br(),
-#       sidebarLayout(
-#         sidebarPanel(
-#           div(
-#             p(
-#               "To visualize gene expression in mouse datasets.\n Select one or two gene(s) of interest, and \nplot an interactive boxplot for gene expression data"
-#             )
-#           ),
-#           
-#           # checkboxInput("select_all", "Select All Preloaded Data"),
-#           actionButton("select_all_button", "Select All"),
-#           actionButton("deselect_all_button", "Deselect All"), 
-#           br(),
-#           checkboxGroupInput("gene_expression_data", "Preloaded Data:", choices = NULL),
-#           checkboxInput("uploaded_data", "Uploaded Data:"),
-#           div(
-#             p(
-#               "To download a plot as a PNG image, click the camera icon in the menu at the top-right of the rendered plot.",
-#               style = "font-style: italic; font-size: smaller;"
-#             )
-#           ),
-#           conditionalPanel(
-#             condition = "input.uploaded_data == true",
-#             fileInput(
-#               'uploaded_data_file1', 'Choose CSV File',
-#               accept = c(
-#                 'text/csv',
-#                 'text/comma-separated-values,text/plain',
-#                 '.csv'
-#               )
-#             ),
-#             fileInput(
-#               "groups_File1", "Upload sample groups",
-#               multiple = FALSE,
-#               accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-#             )
-#           ),
-#           conditionalPanel(
-#             condition = "input.uploaded_data == true",
-#             tags$a(id = "newapp", href = "https://winterlab-webapps.fsm.northwestern.edu/Template_GroupFileMaker_v3.1.2_App_20240521/", "Create Formatted Experimental Group File."),
-#             tags$script(
-#               HTML(
-#                 "$(document).on('click', '#newapp', function (e) {
-#                       e.preventDefault();
-#                       window.open($(this).attr('href'));
-#                   });"
-#               )
-#             )
-#           ),
-#           radioButtons("cpm_or_fpkm", "CPM or FPKM preloaded data repository:", c("CPM" = "cpm", "FPKM" = "fpkm"), selected = "cpm"),
-#           radioButtons("colSel_pri", "Select Gene Nomenclature:", c("Ensembl ID" = "one", "Gene Symbol" = "two"), selected = "two"),
-#           radioButtons("gene_select_method", "Upload a gene list or select individual genes to visualize:", c("Individual Genes" = "gene", "Gene List CSV" = "csv"), selected = "gene"),
-#           conditionalPanel(
-#             condition = "input.gene_select_method == 'csv'",
-#           fileInput("gene_file", "Upload CSV of Genes", 
-#                     accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv"))),
-#           conditionalPanel(
-#             condition = "input.gene_select_method == 'gene'",
-#           uiOutput('select_pri')),
-#           width = 3
-#         ),
-#         mainPanel(br(),
-#                   tags$div(
-#                     style = "overflow-y: scroll; height: 1200px;",
-#           uiOutput("dataset_tabs")), br(),
-#           div(
-#             p(
-#               "(The boxplots are in a scrollable window.)",
-#               style = "font-style: italic; font-size: smaller;"
-#             )
-#           )
-#         )
-#       )
-#     ),
-#     tabPanel( "Gene Expression Heatmaps",
-#               # This used to be in a sidebarLayout with the selectInputs and conditionalPanels in a sidebarPanel with width 3. The mainPanel had width 9. 
-#               br(),
-#               selectInput("ExpGrp_or_Sample", "Visualize by Experimental Groups or Samples?", choices = c("Group", "Sample"), selected = "Group"),
-#               selectInput("cluster_hm_method", "Select Method to Cluster Heatmap Genes by:", choices = c("No Clustering" = "none",
-#                                                                                                          "K-Means" = "kmeans",
-#                                                                                                          "Hierarchical" = "hierarchical"), selected = "none"),
-#               conditionalPanel( # CPM files - this is where the groupmaker app link will be
-#                 condition = "input.cluster_hm_method == 'kmeans'",
-#                 numericInput("number_o_clusters", "Number of K-Means Clusters:", value = 2, min = 0, step = 1)),
-#               conditionalPanel( # CPM files - this is where the groupmaker app link will be
-#                 condition = "input.cluster_hm_method == 'hierarchical'",
-#                 selectInput("dendrogram", "Dendrogram?", choices = c("No", "Yes"), selected = "No")),
-#               
-#               tags$div(
-#                 style = "overflow-y: scroll; height: 1200px;",
-#               uiOutput("heatmap_tabs")), br(),
-#               div(
-#                 p(
-#                   "(The heatmap is in a scrollable window.)",
-#                   style = "font-style: italic; font-size: smaller;"
-#                 )
-#               ))
-#   )
-# ) # UI script
-
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
@@ -347,6 +165,7 @@ server <- function(input, output, session) {
   # log_info("ggplot2 version: {packageVersion('ggplot2')}")
   # log_info("dendextend version: {packageVersion('dendextend')}")
 
+  print("Checkpoint 1: Entered server function")
   selected_genes <- reactiveValues(genes = NULL)
   previous_selected_genes <- reactiveVal(character()) 
   
@@ -359,7 +178,7 @@ server <- function(input, output, session) {
   
   gene_file_genes <- reactive({
     req(input$gene_file)
-    
+    print("Checkpoint 2: gene_file_genes")
     # Read the uploaded file and extract the gene symbols
     gene_data <- read.csv(input$gene_file$datapath, header = TRUE, stringsAsFactors = FALSE)
     
@@ -375,7 +194,7 @@ server <- function(input, output, session) {
   # take 3
   combined_data <- reactive({
     req(length(selected_genes$genes) > 0)
-    
+    print("Checkpoint 3: combined_data")
     # Preloaded dataset logic
     datasets <- setdiff(input$gene_expression_data, "User Uploaded Data")
     preloaded_result <- load_datasets(
@@ -384,7 +203,7 @@ server <- function(input, output, session) {
       selected_genes$genes,
       selNum_pri()
     )
-    
+    print("Checkpoint 4")
     # Only pull user-uploaded data from the reactive functions
     # (NOT from processed_datasets$data), so it don't cause a feedback loop.
     user_uploaded_result <- list(data = list(), groups = list())
@@ -401,7 +220,7 @@ server <- function(input, output, session) {
         user_uploaded_result$groups[["User Uploaded Data"]] <- user_groups
       }
     }
-    
+    print("Checkpoint 5")
     # Merge them
     result = list(
       data   = c(preloaded_result$data,  user_uploaded_result$data),
@@ -414,6 +233,8 @@ server <- function(input, output, session) {
   observe({
     new_data <- combined_data()
     req(new_data)  # Make sure it's not null
+    print("Checkpoint 6: new_data")
+    # print(new_data)
 
     processed_datasets$data <- new_data$data
     processed_datasets$groups <- new_data$groups
@@ -423,13 +244,14 @@ server <- function(input, output, session) {
   # Reactive for expression data
   uploaded_expr_data <- reactive({
     req(input$uploaded_data_file1)
+    print("Checkpoint 7: uploaded_expr_data")
     read.csv(input$uploaded_data_file1$datapath, check.names = FALSE)
   })
   
   # Reactive for group data
   uploaded_group_data <- reactive({
     req(input$groups_File1, uploaded_expr_data())
-    
+    print("Checkpoint 8: uploaded_group_data")
     expr_data <- uploaded_expr_data()
     group_df <- read.csv(input$groups_File1$datapath)
     
@@ -449,7 +271,7 @@ server <- function(input, output, session) {
   observe({
     # Ensure both reactivities are valid
     req(uploaded_expr_data(), uploaded_group_data())
-    
+    print("Checkpoint 9")
     processed_datasets$data[["User Uploaded Data"]]   <- uploaded_expr_data()
     processed_datasets$groups[["User Uploaded Data"]] <- uploaded_group_data()
     
@@ -461,11 +283,13 @@ server <- function(input, output, session) {
   lastDataset <- reactiveValues(data = NULL)
   
   observe({
+    print("Checkpoint 10: lastDataset$data")
     lastDataset$data <- input$gene_expression_data
+    print(lastDataset$data)
   })
   
   observeEvent(input$cpm_or_fpkm, {
-    print("input$cpm_or_fpkm")
+    print("Checkpoint 11: input$cpm_or_fpkm")
     datasets <- datasets_info("./FPKM_expression_files", "./Primary")
     
     if (input$cpm_or_fpkm == "cpm") {
@@ -483,7 +307,7 @@ server <- function(input, output, session) {
   
   # II
   observeEvent(input$select_all_button, {
-    print("input$select_all_button")
+    print("Checkpoint 12: input$select_all_button")
     req(input$cpm_or_fpkm)
     cpm_path <- "./Primary"
     fpkm_path <- "./FPKM_expression_files"
@@ -500,7 +324,7 @@ server <- function(input, output, session) {
   #   updateCheckboxGroupInput(session, "gene_expression_data", selected = character(0))
   # })
   observeEvent(input$deselect_all_button, {
-    print("input$deselect_all_button")
+    print("Checkpoint 13: input$deselect_all_button")
     # Update the UI to clear selections
     updateCheckboxGroupInput(session, "gene_expression_data", selected = character(0))
     
@@ -523,7 +347,7 @@ server <- function(input, output, session) {
   #II
   observeEvent(input$gene_expression_data, {
     req(input$cpm_or_fpkm)
-    print("input$gene_expression_data")
+    print("Checkpoint 14: input$gene_expression_data")
     
     cpm_path <- "./Primary"
     fpkm_path <- "./FPKM_expression_files"
@@ -546,6 +370,7 @@ server <- function(input, output, session) {
   })
   
   observe({
+    print("Checkpoint 15")
     datasets <- datasets_info("./FPKM_expression_files", "./Primary")
     if (!is.null(lastDataset$data) && length(lastDataset$data) > 0 && any(lastDataset$data %in% datasets$unavailable)) {
       updateRadioButtons(session, "cpm_or_fpkm", selected = "cpm", choices = c(CPM = "cpm"))
@@ -555,6 +380,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$cpm_or_fpkm, {
+    print("Checkpoint 16")
     if (input$cpm_or_fpkm == "cpm") {
       datasetSelected("cpm")
     } else if (input$cpm_or_fpkm == "fpkm") {
@@ -565,6 +391,7 @@ server <- function(input, output, session) {
   selNum_pri <- reactive(switch(input$colSel_pri, one = 1, two = 2))
   
   title_pri <- reactive({
+    print("Checkpoint 17: title_pri")
     get_data_title(input$gene_expression_data, input$uploaded_data_title)
   })
   
@@ -573,13 +400,15 @@ server <- function(input, output, session) {
   # II
   observeEvent(input$gene_expression_data, {
     req(input$cpm_or_fpkm)
-
+    print("Checkpoint 18: input$gene_expression_data")
     selected_datasets <- input$gene_expression_data
     current_selected_genes <- selected_genes$genes  # Get currently selected genes
     previous_genes <- previous_selected_genes()  # Get previously selected genes
 
     # Identify newly selected datasets that haven't been processed yet
     new_datasets <- setdiff(selected_datasets, names(RenPlo$data))
+    print("Checkpoint 18A: new_datasets")
+    print(new_datasets)
 
     # Identify datasets that have been removed
     removed_datasets <- setdiff(names(RenPlo$data), selected_datasets)
@@ -599,6 +428,7 @@ server <- function(input, output, session) {
 
     # Remove plots from RenPlo for deselected datasets
     for (dataset in removed_datasets) {
+      print("Checkpoint 18b: Removing dataset", dataset)
       RenPlo$data[[dataset]] <- NULL
     }
 
@@ -609,10 +439,10 @@ server <- function(input, output, session) {
   # III
   preprocessing_selected_genes_datasets <- reactive({
     
-    print("inside preprocessing_selected_genes_datasets")
-    print(selected_genes$genes)
+    print("Checkpoint 19: preprocessing_selected_genes_datasets")
+    # print(selected_genes$genes)
     req(processed_datasets$data, selected_genes$genes)
-    
+    print("Cleared checkpoint 19")
     # Check if any previously processed datasets need updates due to newly selected genes
     affected_datasets <- names(RenPlo$data)
     datasets_with_new_genes <- Filter(function(dataset) {
@@ -624,7 +454,7 @@ server <- function(input, output, session) {
     datasets_to_process <- unique(c(non_processed_df_list$names, datasets_with_new_genes))
     
     datasets_to_process <- datasets_to_process[!is.na(datasets_to_process)]
-    processed_datasets$data
+    # processed_datasets$data
     
     # If nothing to process, return empty list
     #if (length(datasets_to_process) == 0) {
@@ -633,9 +463,17 @@ server <- function(input, output, session) {
     
     # These lines update the plots whether one is added or removed
     valid_datasets <- processed_datasets$data[datasets_to_process]
-    # Process everything
+    # print("Checkpoint 19A: valid_datasets")
+    # print(valid_datasets)
+    
+    # Process everything at once. Without this line, when a gene is deselected, the boxplot won't disappear
     valid_datasets <- processed_datasets$data
+    # print("Checkpoint 19B: valid_datasets")
+    # print(valid_datasets)
+    
     valid_datasets <- valid_datasets[!sapply(valid_datasets, is.null)]
+    # print("Checkpoint 19C: valid_datasets")
+    # print(valid_datasets)
     
     results_list <- future_lapply(valid_datasets, function(dataset) {
       future_lapply(selected_genes$genes, function(gene) {
@@ -653,9 +491,9 @@ server <- function(input, output, session) {
   
   # II
   formattedData_pri <- reactive({
-    print("Entered formattedData_pri")
+    print("Checkpoint 20: formattedData_pri")
     results_list <- preprocessing_selected_genes_datasets()
-    print(results_list)
+    # print(results_list)
 
     # log_info("Line 506 results_list")
     # log_info("data in results_list Data: {paste(capture.output(print(results_list)), collapse = '\n')}")
@@ -675,6 +513,7 @@ server <- function(input, output, session) {
   })
   
   cpm_fpkm_labeler_Yaxis <- reactive({
+    print("Checkpooint 21: cpm_fpkm_labeler_Yaxis")
     if (input$cpm_or_fpkm == "cpm") {
       label <- "CPM"
     } else if (input$cpm_or_fpkm == "fpkm") {
@@ -684,6 +523,7 @@ server <- function(input, output, session) {
   })
   
   observe({
+    print("Checkpoint 22")
     if (input$gene_select_method == "gene") {
       # log_debug("Updating selected_genes$genes with input$mygene_pri: ", paste(input$mygene_pri, collapse=", "))
       selected_genes$genes <- input$mygene_pri
@@ -696,30 +536,38 @@ server <- function(input, output, session) {
   
   # GOOD - original gene choice
   # This part spazzes out when more than one input is selected at once
-  output$select_pri = renderUI({
-    print("Entered output$select_pri")
+  output$select_pri <- renderUI({
+    print("Checkpoint 23: output$select_pri")
     choiceList_pri <- choiceList_pri()
+    print("Checkpoint 23A")
     
-    selectizeInput("mygene_pri",
-                  label = h5("Select Gene of Interest to Visualize:"),
-                  multiple = TRUE,
-                  selected = if (is.null(input$mygene_pri) || length(input$mygene_pri) == 0) { "" }
-                              else { selected_genes$genes },
-                  choices = choiceList_pri,
-                  options = list(create = TRUE, placeholder = 'Type here or choose from the list'))
-    
-    
-    
+    selectizeInput(
+      "mygene_pri",
+      label = h5("Select Gene of Interest to Visualize:"),
+      multiple = TRUE,
+      choices = choiceList_pri,
+      options = list(create = TRUE, placeholder = 'Type here or choose from the list')
+    )
+  })
+  
+  # New observeEvent block. Without this, there is a glitch where choosing a second gene before the first gene finishes loading will cause the app to flicker, freeze and crash.
+  # Set the default selection once after choices are ready
+  observeEvent(choiceList_pri(), {
+    if (is.null(input$mygene_pri) || length(input$mygene_pri) == 0) {
+      updateSelectizeInput(session, "mygene_pri", selected = "")
+    } else {
+      updateSelectizeInput(session, "mygene_pri", selected = selected_genes$genes)
+    }
   })
   
   # What genes are selected?
   observeEvent(input$mygene_pri, {
-    print("input$mygene_pri changed to:")
+    print("Checkpoint 24: input$mygene_pri changed to")
     print(input$mygene_pri)
   })
   
   output$dataset_tabs <- renderUI({
-    print("output$dataset_tabs")
+    print("Checkpoint 25: output$dataset_tabs")
     print("selected_genes$genes")
     print(selected_genes$genes)
     
@@ -727,8 +575,12 @@ server <- function(input, output, session) {
     req(length(selected_genes$genes) > 0)
     # Only include datasets that are in RenPlo and not in Removed_DF
     active_datasets <- setdiff(names(RenPlo$data), Removed_DF$names)
+    print("Checkpoint 26: active_datasets")
+    print(active_datasets)
     
+    # Creates the tabs, I think?
     dataset_tabs <- lapply(active_datasets, function(dataset) {
+      print("Checkpoint 26A: creating a sub-tab, I think?")
       tabPanel(
         title = dataset,
         uiOutput(paste0("gene_plots_", gsub("[^a-zA-Z0-9]", "_", dataset)))
@@ -740,7 +592,7 @@ server <- function(input, output, session) {
   
   # II
   observeEvent(formattedData_pri(), {
-    print("Are we getting here?")
+    print("Checkpoint 27: Are we getting here?")
     formatted_data <- formattedData_pri()
 
     # Require formatted data
@@ -749,17 +601,20 @@ server <- function(input, output, session) {
     # Ensure we are processing ALL datasets that need rendering
     datasets_to_process <- names(formatted_data)  # Process ALL datasets with new genes
 
-    print("Datasets to process:")
+    print("Checkpoint 28: Datasets to process...")
     print(datasets_to_process)
 
     withProgress(message = 'Rendering plots...', value = 0, {
+      print("Checkpoint 29: Entered withProgress")
       total_datasets <- length(datasets_to_process)
       dataset_count <- 0
 
       # ✅ Ensure UI outputs are always created for all genes in active datasets
       lapply(datasets_to_process, function(dataset_name) {
+        print("Checkpoint 30: entered function(dataset_name)")
         output[[paste0("gene_plots_", gsub("[^a-zA-Z0-9]", "_", dataset_name))]] <- renderUI({
           gene_plots <- lapply(names(formatted_data[[dataset_name]]), function(gene_name) {
+            print("Checkpoint 31: entered function(gene_name)")
             plot_data <- formatted_data[[dataset_name]][[gene_name]]
 
             if (!("Count" %in% names(plot_data))) {
@@ -802,17 +657,24 @@ server <- function(input, output, session) {
       # ✅ Second loop: Render plots for ALL datasets
       # lapply(datasets_to_process, function(dataset_name) {
       for (dataset_name in datasets_to_process) {
+        print("Checkpoint 32: entered for loop")
+        # print(dataset_name)
         # ⚠️ Fix: Check if this dataset already has genes stored
         existing_genes <- names(RenPlo$data[[dataset_name]])
         new_genes <- setdiff(names(formatted_data[[dataset_name]]), existing_genes)
 
+        # It really shouldn't matter what order the dataset_names are checked in
+        # With a RETURN statement, some datasets might be skipped and the required plot(s) would not be created. In turn, the sub-tab for the new dataset would not be created.
+        # With a NEXT keyword, this ensures all datasets are checked and the required plot(s) are created. In turn, the sub-tab for the new dataset is then created.
         if (length(new_genes) == 0) {
-          return()  # Skip if no new genes
+          # print("Checkpoint 32A: No new genes! Moving on...")
+          next  # Skip if no new genes
         }
 
         print(paste("New genes detected in dataset:", dataset_name, "->", paste(new_genes, collapse = ", ")))
 
         lapply(new_genes, function(gene_name) {
+          print("Checkpoint 33: entered second function(gene_name)")
           plot_data <- formatted_data[[dataset_name]][[gene_name]]
 
           # log_info("Line 631 adding new genes by filtering the chosen dataset")
@@ -824,13 +686,16 @@ server <- function(input, output, session) {
             gsub("[^a-zA-Z0-9]", "_", gene_name)
           )
 
+          print("Checkpoint 34: about to plot_the_data")
           output[[plot_output_id]] <- renderPlotly({
             plot_the_data(plot_data, dataset_name, cpm_fpkm_labeler_Yaxis(), gene_name)
           })
 
           # ✅ Store newly rendered genes inside RenPlo
+          print("Checkpoint 35: Is plot_data null?")
           if (!is.null(plot_data)) {
             if (is.null(RenPlo$data[[dataset_name]])) {
+              print("Yes")
               RenPlo$data[[dataset_name]] <- list()
             }
             RenPlo$data[[dataset_name]][[gene_name]] <- plot_data
@@ -841,12 +706,13 @@ server <- function(input, output, session) {
         dataset_count <<- dataset_count + 1
         incProgress(1 / total_datasets, detail = paste("Rendering plots for", dataset_name))
       }#)
+      print("Checkpoint 36: end of withProgress")
     }) # End of withProgress
 
     # ✅ Remove processed datasets from `non_processed_df_list`
     non_processed_df_list$names <- setdiff(non_processed_df_list$names, datasets_to_process)
 
-    print("Updated RenPlo data after rendering:")
+    print("Checkpoint 37: Updated RenPlo data after rendering...")
     print(names(RenPlo$data))
   })
   
@@ -871,9 +737,10 @@ server <- function(input, output, session) {
   ## REACTIVE heatmaps
   averaged_data_list <- reactive({
     # Create a progress bar
+    print("Checkpoint 38: Entered averaged_data_list")
     withProgress(message = "Averaging data...", value = 0, {
       # Get the original data and groups
-      
+      print("Checkpoint 39: entered withProgress")
       GEtable_list <- processed_datasets$data
       grps_list <- processed_datasets$groups
       selected_genes <- selected_genes$genes
@@ -886,6 +753,7 @@ server <- function(input, output, session) {
       
       # Loop over the datasets, updating the progress bar
       for (i in seq_along(GEtable_list)) {
+        print("Checkpoint 40: entered for loop")
         dataset_name <- names(GEtable_list)[i]
         GEtable <- GEtable_list[[i]]
         grps <- grps_list[[i]]
@@ -916,6 +784,7 @@ server <- function(input, output, session) {
     if (input$main_tabs != "Gene Expression Heatmaps") {
       return(NULL)  # Exit the reactive function if not on Heatmap tab
     }
+    print("Checkpoint 41: Entered combined_HM")
     
     clustering_method <- input$cluster_hm_method
     cluster_number <- input$number_o_clusters
@@ -936,7 +805,7 @@ server <- function(input, output, session) {
       data_list <- GEtable_list
     }
     
-    print(" grps_list from within the combined HM function")
+    print("Checkpoint 42: grps_list from within the combined HM function")
     print(grps_list)
     # Use Map to apply the helper function over data_list and grps_list
     # browser()
@@ -955,7 +824,7 @@ server <- function(input, output, session) {
   
   # Generate the heatmap tabs dynamically using combined_HM()
   output$heatmap_tabs <- renderUI({
-    
+    print("Checkpoint 43: output$heatmap_tabs")
     # Initialize the list of datasets to include the preloaded datasets
     datasets <- input$gene_expression_data
     
@@ -978,7 +847,7 @@ server <- function(input, output, session) {
   
   # CHUNK LOAD
   observeEvent(combined_HM(), {
-    
+    print("Checkpoint 44: combined_HM")
     heatmap_list <- combined_HM()
     chunk_size <- 5  # Adjust this based on available memory
     dataset_names <- names(heatmap_list)
@@ -988,6 +857,7 @@ server <- function(input, output, session) {
     
     # browser()
     # Split dataset names into chunks
+    print("Checkpoint 45: About to split")
     if (!is.null(dataset_names)) {
       print("dataset_names is not null!")
       chunks <- split(dataset_names, ceiling(seq_along(dataset_names) / chunk_size))
@@ -997,6 +867,7 @@ server <- function(input, output, session) {
         
         # Process each chunk
         lapply(chunk, function(dataset_name) {
+          print("Checkpoint 46: Entered lapply")
           result <- heatmap_list[[dataset_name]]
           plot_output_id <- paste0("heatmap_plot_", gsub("[^a-zA-Z0-9]", "_", dataset_name))
           
