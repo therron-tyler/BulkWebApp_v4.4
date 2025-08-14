@@ -14,6 +14,3 @@ The following glitches were found and fixed:
 - If a second gene is selected before the first selected gene fully loads, the app flickers, freezes and then crashes.
 - If a gene is deselected from the list, the associated boxplot does not always get deleted.
 - When the non-deletion glitch was fixed, another glitch arose: selected a second dataset does not always produce a sub-tab under "Data Visualization" for that dataset.
-
-The following glitches remain:
-- If a dataset is selected, then deselected, the app crashes.
